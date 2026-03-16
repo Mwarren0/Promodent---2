@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Expediente Digital - Promodent</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    .folder-container { max-width: 1000px; margin: 30px auto; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .diente { width: 30px; height: 40px; border: 1px solid #ccc; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; margin: 2px; border-radius: 3px; }
+    .sano { background: #e2fce6; }
+    .caries { background: #fee2e2; border-color: #ef4444; }
+    .tratado { background: #e0f2fe; border-color: #3b82f6; }
+    textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body x-data="folderApp()" class="bg-slate-100">
+
+  <header>
+    <nav class="navbar"><div class="logo">Promodent</div><ul class="nav-links"><li><a href="pacientes.html">← Volver</a></li></ul></nav>
+  </header>
+
+  <main class="folder-container" id="expediente-imprimir">
+    <div class="card">
+      <h1 id="display-nombre" style="color:#026aa7; margin-bottom: 5px;">Cargando...</h1>
+      <p id="display-id" style="color:#666; font-size: 0.9em;"></p>
+      
+      <hr style="margin: 20px 0; opacity: 0.2;">
+
+      <h3>Odontograma Interactivo</h3>
+      <div id="odontograma-box" style="text-align:center; padding: 20px; background: #f9fbfd; border-radius: 10px;">
+        </div>
+
+      <h3 style="margin-top:20px;">Evolución y Notas</h3>
+      <textarea id="notas" rows="8" oninput="guardarNotas()" placeholder="Escriba aquí los hallazgos de hoy..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>💊 Generar Receta</h3>
+      <textarea id="texto-receta" rows="5" placeholder="Medicamentos y dosis..."></textarea>
+      <button onclick="descargarReceta()" class="btn-agendar" style="width:100%; margin-top:10px; border:none; cursor:pointer;">Descargar PDF</button>
+      
+      <div style="margin-top:30px; font-size: 0.8em; color: #888;">
+        <p>📍 Riobamba, Ecuador</p>
+        <p>📞 +593 3 299 9999</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pacienteId = urlParams.get('id');
+    let pacienteActual = null;
+
+    function cargarDatos() {
+      const pacientes = JSON.parse(localStorage.getItem("promodent_pacientes")) || [];
+      pacienteActual = pacientes.find(p => p.id === pacienteId);
+
+      if(pacienteActual) {
+        document.getElementById("display-nombre").innerText = pacienteActual.nombre;
+        document.getElementById("display-id").innerText = "Expediente: " + pacienteActual.id;
+        document.getElementById("notas").value = pacienteActual.notas || "";
+        dibujarOdontograma();
+      }
+    }
+
+    function dibujarOdontograma() {
+      const box = document.getElementById("odontograma-box");
+      const dientes = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+      
+      // Si el paciente no tiene odontograma guardado, creamos uno sano
+      if(!pacienteActual.odontograma) {
+        pacienteActual.odontograma = dientes.map(d => ({id: d, estado: 'sano'}));
+      }
+
+      box.innerHTML = "";
+      pacienteActual.odontograma.forEach((d, index) => {
+        const div = document.createElement("div");
+        div.className = `diente ${d.estado}`;
+        div.innerText = d.id;
+        div.onclick = () => {
+          const estados = ['sano', 'caries', 'tratado'];
+          let i = estados.indexOf(d.estado);
+          d.estado = estados[(i + 1) % 3];
+          div.className = `diente ${d.estado}`;
+          guardarGlobal();
+        };
+        box.appendChild(div);
+      });
+    }
+
+    function guardarNotas() {
+      pacienteActual.notas = document.getElementById("notas").value;
+      guardarGlobal();
+    }
+
+    function guardarGlobal() {
+      let pacientes = JSON.parse(localStorage.getItem("promodent_pacientes"));
+      const index = pacientes.findIndex(p => p.id === pacienteId);
+      pacientes[index] = pacienteActual;
+      localStorage.setItem("promodent_pacientes", JSON.stringify(pacientes));
+    }
+
+    function descargarReceta() {
+      const texto = document.getElementById("texto-receta").value;
+      if(!texto) return alert("Escribe la receta primero");
+
+      const printArea = document.createElement("div");
+      printArea.innerHTML = `
+        <div style="padding:40px; font-family: sans-serif;">
+          <h1 style="color:#026aa7">PROMODENT - RECETA</h1>
+          <p><strong>Paciente:</strong> ${pacienteActual.nombre}</p>
+          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+          <hr>
+          <div style="margin-top:20px; min-height:300px">
+            <h3>Prescripción:</h3>
+            <p>${texto.replace(/\n/g, '<br>')}</p>
+          </div>
+          <p style="text-align:center; margin-top:50px">___________________<br>Firma del Odontólogo</p>
+        </div>
+      `;
+      html2pdf().from(printArea).save(`Receta_${pacienteActual.nombre}.pdf`);
+    }
+
+    window.onload = cargarDatos;
+  </script>
+</body>
+</html>

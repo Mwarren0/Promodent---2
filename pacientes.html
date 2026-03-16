@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacientes - Promodent</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .modulo-agregar { background: white; padding: 25px; margin: 20px auto; max-width: 600px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .modulo-agregar input, .modulo-agregar select { width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 6px; border: 1px solid #ddd; }
+    .btn-guardar { background: #026aa7; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .acciones button { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85em; margin: 2px; }
+    .historial { background: #01497c; color: white; }
+    .eliminar { background: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">Promodent</div>
+      <ul class="nav-links">
+        <li><a href="dashboard.html">Panel</a></li>
+        <li><a href="index.html">Cerrar sesión</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="pacientes">
+    <h1>Directorio de Pacientes</h1>
+    
+    <div class="modulo-agregar">
+      <h3>Registrar Nuevo Paciente</h3>
+      <input type="text" id="nombre" placeholder="Nombre completo" />
+      <input type="text" id="telefono" placeholder="Teléfono" />
+      <button class="btn-guardar" onclick="agregarPaciente()">Crear Expediente</button>
+    </div>
+
+    <div class="tabla-pacientes">
+      <table id="tabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="lista-pacientes"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    let pacientes = JSON.parse(localStorage.getItem("promodent_pacientes")) || [];
+
+    function renderizar() {
+      const lista = document.getElementById("lista-pacientes");
+      lista.innerHTML = "";
+      pacientes.forEach((p, i) => {
+        lista.innerHTML += `
+          <tr>
+            <td>${p.id}</td>
+            <td><strong>${p.nombre}</strong></td>
+            <td>${p.telefono}</td>
+            <td class="acciones">
+              <button class="historial" onclick="verFolder('${p.id}')">📂 Abrir Folder</button>
+              <button class="eliminar" onclick="eliminar(${i})">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function agregarPaciente() {
+      const nombre = document.getElementById("nombre").value;
+      const telefono = document.getElementById("telefono").value;
+      if(!nombre) return alert("Nombre obligatorio");
+      
+      const nuevo = { id: "P-" + Date.now().toString().slice(-4), nombre, telefono };
+      pacientes.push(nuevo);
+      localStorage.setItem("promodent_pacientes", JSON.stringify(pacientes));
+      renderizar();
+      document.getElementById("nombre").value = "";
+    }
+
+    function verFolder(id) {
+      window.location.href = `historial.html?id=${id}`;
+    }
+
+    function eliminar(i) {
+      if(confirm("¿Borrar paciente?")) {
+        pacientes.splice(i, 1);
+        localStorage.setItem("promodent_pacientes", JSON.stringify(pacientes));
+        renderizar();
+      }
+    }
+
+    renderizar();
+  </script>
+</body>
+</html>

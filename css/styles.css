@@ -1,0 +1,538 @@
+/* Reset y fuente base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f4fa;
+  color: #333;
+}
+
+/* TOP BAR */
+.top-bar {
+  background-color: #01497c;
+  color: white;
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+}
+
+.top-bar .left-info span {
+  margin-right: 15px;
+}
+
+.top-bar .right-info span {
+  margin-right: 15px;
+}
+
+.top-bar a img {
+  width: 20px;
+  vertical-align: middle;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-size: 1.8em;
+  color: #026aa7;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #01497c;
+  font-weight: bold;
+  padding: 8px 12px;
+  transition: all 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #0180c0;
+  background-color: #e6f2ff;
+  border-radius: 6px;
+}
+
+.nav-links a.active {
+  border-bottom: 3px solid #026aa7;
+}
+
+.btn-agendar {
+  background-color: #026aa7;
+  color: white !important;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* HERO SECTION */
+.hero {
+  background: url('../img/odontologia.jpg') center/cover no-repeat;
+  padding: 80px 20px;
+  text-align: center;
+  color: white;
+  background-blend-mode: multiply;
+  background-color: rgba(2,106,167,0.7);
+}
+
+.hero h1 {
+  font-size: 2.8em;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
+.hero-buttons a {
+  text-decoration: none;
+  padding: 12px 24px;
+  margin: 0 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: white;
+  color: #026aa7;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+/* SERVICIOS */
+.servicios {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #f9fbfd;
+}
+
+.servicios h1 {
+  font-size: 2.4em;
+  color: #026aa7;
+  margin-bottom: 10px;
+}
+
+.servicios p {
+  font-size: 1.1em;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.servicio-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.servicio-card:hover {
+  transform: translateY(-5px);
+}
+
+.servicio-card img {
+  width: 60px;
+  margin-bottom: 15px;
+}
+
+.servicio-card h3 {
+  color: #01497c;
+  margin-bottom: 10px;
+}
+
+.servicio-card p {
+  font-size: 0.95em;
+  color: #444;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #01497c;
+  color: white;
+  font-size: 0.9em;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .hero h1 {
+    font-size: 2em;
+  }
+
+  .hero p {
+    font-size: 1em;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .servicios-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Contacto */
+.contacto {
+  padding: 60px 20px;
+  background-color: #f9fbfd;
+  text-align: center;
+}
+
+.contacto h1 {
+  font-size: 2.4em;
+  color: #026aa7;
+  margin-bottom: 10px;
+}
+
+.contacto p {
+  font-size: 1.1em;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.contact-info {
+  text-align: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*Agendar */
+
+.agendar {
+  padding: 60px 20px;
+  background-color: #fefefe;
+  text-align: center;
+}
+
+.agendar h1 {
+  font-size: 2.2em;
+  color: #026aa7;
+  margin-bottom: 10px;
+}
+
+.agendar p {
+  font-size: 1.05em;
+  color: #666;
+  margin-bottom: 35px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.agendar-opciones {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.agendar-opciones label {
+  font-weight: bold;
+  font-size: 1em;
+  color: #01497c;
+}
+
+.agendar-opciones select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+  width: 100%;
+  background-color: #f9fbfd;
+}
+
+.btn-whatsapp {
+  background-color: #24cc63;
+  color: white;
+  font-weight: bold;
+  padding: 14px 26px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  text-align: center;
+  font-size: 1em;
+}
+
+.btn-whatsapp:hover {
+  background-color: #1dbb5a;
+}
+
+/* Login */
+
+.login {
+  padding: 80px 20px;
+  background-color: #f9fbfd;
+  text-align: center;
+}
+
+.login h1 {
+  font-size: 2.2em;
+  color: #026aa7;
+  margin-bottom: 10px;
+}
+
+.login p {
+  font-size: 1.05em;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.login-form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+.login-form button {
+  background-color: #026aa7;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #01497c;
+}
+
+/*Dashboard */
+
+.dashboard {
+  padding: 60px 20px;
+  background-color: #fefefe;
+  text-align: center;
+}
+
+.dashboard h1 {
+  font-size: 2em;
+  color: #026aa7;
+  margin-bottom: 15px;
+}
+
+.dashboard p {
+  font-size: 1.1em;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.panel-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: #01497c;
+  font-weight: bold;
+  font-size: 1.1em;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.panel-card:hover {
+  transform: translateY(-5px);
+  background-color: #e6f2ff;
+}
+
+/*Pacientes */
+
+.pacientes {
+  padding: 60px 20px;
+  background-color: #fefefe;
+  text-align: center;
+}
+
+.pacientes h1 {
+  font-size: 2.2em;
+  color: #026aa7;
+  margin-bottom: 10px;
+}
+
+.pacientes p {
+  font-size: 1.05em;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.busqueda {
+  margin-bottom: 30px;
+}
+
+.busqueda input {
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 250px;
+}
+
+.busqueda button {
+  padding: 10px 18px;
+  margin-left: 10px;
+  background-color: #026aa7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tabla-pacientes table {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  border-collapse: collapse;
+}
+
+.tabla-pacientes th,
+.tabla-pacientes td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.tabla-pacientes th {
+  background-color: #f0f6fb;
+  color: #026aa7;
+}
+
+.tabla-pacientes tr:hover {
+  background-color: #f9fbfd;
+}
+
+.panel-opciones a {
+  display: inline-block;
+  margin: 10px;
+  padding: 14px 26px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.panel-opciones .btn-primary {
+  background-color: #026aa7;
+  color: white;
+}
+
+.panel-opciones .btn-secondary {
+  background-color: transparent;
+  border: 2px solid #026aa7;
+  color: #026aa7;
+}
+
+/* Añadir al final de styles.css */
+.diente {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 45px;
+    margin: 3px;
+    border: 1px solid #026aa7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    transition: 0.3s;
+}
+
+.sano { background-color: #e2fce6; color: #1e4620; }
+.caries { background-color: #fee2e2; color: #991b1b; border-color: #ef4444; }
+.tratado { background-color: #e0f2fe; color: #075985; border-color: #3b82f6; }
+
+.folder-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .folder-container { grid-template-columns: 1fr; }
+}
