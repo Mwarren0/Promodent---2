@@ -3,37 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expediente Clínico PRO - Promodent</title>
+  <title>Expediente Integral - Promodent</title>
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    :root { --primary: #026aa7; --accent: #01497c; }
-    .folder-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-    .card { background: white; padding: 25px; border-radius: 12px; shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e1e8f0; }
+    :root { --primary: #026aa7; --accent: #f59e0b; --success: #10b981; }
+    .folder-grid { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 20px; max-width: 1300px; margin: 20px auto; padding: 0 15px; }
+    .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #d1d9e6; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
     
-    /* Odontograma Estilizado */
-    .odontograma-container { background: #f8fafc; padding: 20px; border-radius: 15px; text-align: center; }
-    .arcada { display: flex; justify-content: center; gap: 4px; margin-bottom: 15px; flex-wrap: wrap; }
+    /* Odontograma */
+    .arcada { display: flex; justify-content: center; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
     .diente { 
-      width: 34px; height: 46px; border: 2px solid #cbd5e1; display: flex; 
+      width: 32px; height: 42px; border: 2px solid #cbd5e1; display: flex; 
       align-items: center; justify-content: center; cursor: pointer; 
-      font-size: 11px; font-weight: bold; border-radius: 4px; transition: 0.2s;
+      font-size: 10px; font-weight: bold; border-radius: 4px; transition: 0.2s;
     }
     .sano { background: white; color: #64748b; }
     .caries { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
     .tratado { background: #e0f2fe; border-color: #3b82f6; color: #1d4ed8; }
     .ausente { background: #f1f5f9; border-color: #94a3b8; color: #94a3b8; border-style: dashed; }
 
-    /* Listas Predeterminadas */
-    .quick-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .tag { 
-      padding: 6px 12px; background: #f1f5f9; border-radius: 20px; 
-      font-size: 0.85em; cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s;
-    }
-    .tag:hover { background: #e2e8f0; color: var(--primary); }
+    /* Tablas de Presupuesto */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+    th { background: #f8fafc; text-align: left; padding: 8px; border-bottom: 2px solid #edf2f7; }
+    td { padding: 8px; border-bottom: 1px solid #edf2f7; }
+    .input-table { border: none; padding: 5px; width: 100%; background: transparent; }
+    .total-row { font-weight: bold; font-size: 1.1em; color: var(--primary); background: #f0f7ff; }
+
+    .tag { padding: 4px 10px; background: #edf2f7; border-radius: 15px; font-size: 0.8em; cursor: pointer; border: 1px solid #cbd5e1; display: inline-block; margin: 2px; }
+    .tag:hover { background: var(--primary); color: white; }
     
-    textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; margin-top: 10px; }
-    .btn-pdf { background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+    textarea, input { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: inherit; }
+    .btn-action { color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -41,160 +42,174 @@
   <header>
     <nav class="navbar">
       <div class="logo">Promodent</div>
-      <ul class="nav-links"><li><a href="pacientes.html">← Regresar</a></li></ul>
+      <ul class="nav-links"><li><a href="pacientes.html">← Salir del Folder</a></li></ul>
     </nav>
   </header>
 
   <main class="folder-grid">
-    
     <section>
       <div class="card">
-        <h1 id="paciente-nombre" style="color: var(--primary);">Cargando Expediente...</h1>
-        <p id="paciente-info" style="color: #64748b;"></p>
+        <h1 id="p-nombre" style="color: var(--primary); margin:0;">Paciente</h1>
+        <p id="p-meta" style="color: #718096;"></p>
       </div>
 
       <div class="card">
-        <h3>🩺 Antecedentes y Enfermedades</h3>
-        <p class="text-sm">Selecciona para agregar rápido:</p>
-        <div class="quick-list">
-          <span class="tag" onclick="addTag('Diabetes', 'antecedentes')">+ Diabetes</span>
-          <span class="tag" onclick="addTag('Hipertensión', 'antecedentes')">+ Hipertensión</span>
-          <span class="tag" onclick="addTag('Alergia Penicilina', 'antecedentes')">+ Alergia Penicilina</span>
-          <span class="tag" onclick="addTag('Asma', 'antecedentes')">+ Asma</span>
-          <span class="tag" onclick="addTag('Ninguna', 'antecedentes')">Ninguna</span>
-        </div>
-        <textarea id="antecedentes" rows="3" oninput="saveData()"></textarea>
-      </div>
-
-      <div class="card">
-        <h3>🦷 Odontograma Clínico</h3>
-        <div class="odontograma-container">
-            <p class="text-sm" style="margin-bottom:10px">Clic para cambiar: Sano ➔ Caries ➔ Tratado ➔ Ausente</p>
-            <div class="arcada" id="arcada-sup"></div>
-            <div class="arcada" id="arcada-inf"></div>
+        <h3>🦷 Odontograma</h3>
+        
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
+            <div class="arcada" id="sup"></div>
+            <div class="arcada" id="inf"></div>
         </div>
       </div>
 
       <div class="card">
-        <h3>📝 Notas de Evolución / Tratamiento Realizado</h3>
-        <div class="quick-list">
-            <span class="tag" onclick="addTag('Limpieza ultrasónica realizada.', 'notas')">Limpieza</span>
-            <span class="tag" onclick="addTag('Resina simple en pieza ', 'notas')">Resina</span>
-            <span class="tag" onclick="addTag('Exodoncia sin complicaciones.', 'notas')">Exodoncia</span>
+        <h3>💰 Presupuesto de Tratamiento</h3>
+        <table id="tabla-presupuesto">
+          <thead>
+            <tr>
+              <th>Tratamiento</th>
+              <th width="80">Costo</th>
+              <th width="40"></th>
+            </tr>
+          </thead>
+          <tbody id="items-presupuesto">
+            </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td>TOTAL ESTIMADO</td>
+              <td id="total-val">$0.00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="quick-list" style="margin-top:10px;">
+          <span class="tag" onclick="agregarItem('Limpieza Profunda', 35)">+ Limpieza ($35)</span>
+          <span class="tag" onclick="agregarItem('Resina Simple', 40)">+ Resina ($40)</span>
+          <span class="tag" onclick="agregarItem('Extracción', 45)">+ Extracción ($45)</span>
+          <span class="tag" onclick="agregarItem('Blanqueamiento', 120)">+ Blanqueamiento ($120)</span>
         </div>
-        <textarea id="notas" rows="6" oninput="saveData()"></textarea>
+        <button class="btn-action" style="background:#6366f1;" onclick="imprimir('presupuesto')">Generar Proforma PDF</button>
       </div>
     </section>
 
     <aside>
-      <div class="card" style="position: sticky; top: 20px;">
-        <h3>💊 Recetario Digital</h3>
-        <p class="text-sm">Medicamentos comunes:</p>
-        <div class="quick-list">
-            <span class="tag" onclick="addTag('Amoxicilina 500mg - 1 cada 8h por 7 días.', 'receta')">Amoxicilina</span>
-            <span class="tag" onclick="addTag('Ibuprofeno 600mg - 1 cada 8h por 3 días (dolor).', 'receta')">Ibuprofeno</span>
-            <span class="tag" onclick="addTag('Paracetamol 500mg - 1 cada 6h (fiebre/dolor).', 'receta')">Paracetamol</span>
-            <span class="tag" onclick="addTag('Ketorolaco 10mg - 1 cada 12h (dolor intenso).', 'receta')">Ketorolaco</span>
-        </div>
-        <textarea id="receta" rows="10" placeholder="Escribe la receta aquí..."></textarea>
-        <button class="btn-pdf" onclick="exportPDF()" style="margin-top:15px;">📥 Descargar Receta (PDF)</button>
+      <div class="card" style="border-left: 5px solid var(--success);">
+        <h3>💊 Recetario</h3>
+        <textarea id="rece" rows="5" oninput="autoSave()" placeholder="Escribe la receta..."></textarea>
+        <button class="btn-action" style="background:var(--success);" onclick="imprimir('receta')">Descargar Receta</button>
+      </div>
+
+      <div class="card" style="border-left: 5px solid var(--accent);">
+        <h3>📜 Certificado Médico</h3>
+        <input type="text" id="cert-diag" placeholder="Diagnóstico">
+        <input type="number" id="cert-dias" value="1" style="margin-top:5px;">
+        <button class="btn-action" style="background:var(--accent);" onclick="imprimir('cert')">Descargar Certificado</button>
+      </div>
+      
+      <div class="card">
+        <h3>📝 Notas Adicionales</h3>
+        <textarea id="notas" rows="4" oninput="autoSave()" placeholder="Observaciones generales..."></textarea>
       </div>
     </aside>
-
   </main>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const pId = urlParams.get('id');
-    let paciente = null;
+    const params = new URLSearchParams(window.location.search);
+    const pacienteId = params.get('id');
+    let db = JSON.parse(localStorage.getItem("promodent_pacientes")) || [];
+    let p = db.find(item => item.id === pacienteId);
 
     function init() {
-      const pacientes = JSON.parse(localStorage.getItem("promodent_pacientes")) || [];
-      paciente = pacientes.find(p => p.id === pId);
-
-      if(!paciente) {
-        alert("Paciente no encontrado");
-        window.location.href = "pacientes.html";
-        return;
-      }
-
-      document.getElementById('paciente-nombre').innerText = paciente.nombre;
-      document.getElementById('paciente-info').innerText = `ID: ${paciente.id} | Tel: ${paciente.telefono}`;
-      document.getElementById('antecedentes').value = paciente.antecedentes || "";
-      document.getElementById('notas').value = paciente.notas || "";
-      document.getElementById('receta').value = paciente.receta_actual || "";
+      if(!p) return window.location.href = 'pacientes.html';
+      document.getElementById('p-nombre').innerText = p.nombre;
+      document.getElementById('p-meta').innerText = `ID: ${p.id} | Tel: ${p.telefono}`;
+      document.getElementById('rece').value = p.receta_temp || "";
+      document.getElementById('notas').value = p.notas || "";
       
+      if(!p.presupuesto) p.presupuesto = [];
       renderOdontograma();
+      renderPresupuesto();
     }
 
     function renderOdontograma() {
-      const sup = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-      const inf = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
-      
-      if(!paciente.odontograma) paciente.odontograma = {};
-
-      const createDientes = (lista, containerId) => {
-        const cont = document.getElementById(containerId);
-        cont.innerHTML = "";
-        lista.forEach(id => {
-          const estado = paciente.odontograma[id] || "sano";
-          const div = document.createElement("div");
-          div.className = `diente ${estado}`;
-          div.innerText = id;
-          div.onclick = () => {
-            const next = { sano: 'caries', caries: 'tratado', tratado: 'ausente', ausente: 'sano' };
-            paciente.odontograma[id] = next[estado];
-            renderOdontograma();
-            saveData();
+      const draw = (list, id) => {
+        const el = document.getElementById(id); el.innerHTML = "";
+        list.forEach(num => {
+          const estado = (p.odontograma && p.odontograma[num]) || 'sano';
+          const d = document.createElement('div');
+          d.className = `diente ${estado}`; d.innerText = num;
+          d.onclick = () => {
+            const cycle = { sano:'caries', caries:'tratado', tratado:'ausente', ausente:'sano' };
+            if(!p.odontograma) p.odontograma = {};
+            p.odontograma[num] = cycle[estado];
+            renderOdontograma(); autoSave();
           };
-          cont.appendChild(div);
+          el.appendChild(d);
         });
       };
-
-      createDientes(sup, "arcada-sup");
-      createDientes(inf, "arcada-inf");
+      draw([18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28], 'sup');
+      draw([48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38], 'inf');
     }
 
-    function addTag(texto, areaId) {
-      const area = document.getElementById(areaId);
-      area.value += (area.value ? "\n" : "") + texto;
-      saveData();
+    function agregarItem(nombre, precio) {
+      p.presupuesto.push({ nombre, precio });
+      renderPresupuesto();
+      autoSave();
     }
 
-    function saveData() {
-      paciente.antecedentes = document.getElementById('antecedentes').value;
-      paciente.notas = document.getElementById('notas').value;
-      paciente.receta_actual = document.getElementById('receta').value;
-
-      let pacientes = JSON.parse(localStorage.getItem("promodent_pacientes"));
-      const idx = pacientes.findIndex(p => p.id === pId);
-      pacientes[idx] = paciente;
-      localStorage.setItem("promodent_pacientes", JSON.stringify(pacientes));
+    function eliminarItem(index) {
+      p.presupuesto.splice(index, 1);
+      renderPresupuesto();
+      autoSave();
     }
 
-    function exportPDF() {
-      const recetaTexto = document.getElementById('receta').value;
-      if(!recetaTexto) return alert("La receta está vacía");
+    function renderPresupuesto() {
+      const lista = document.getElementById('items-presupuesto');
+      lista.innerHTML = "";
+      let total = 0;
+      p.presupuesto.forEach((item, i) => {
+        total += parseFloat(item.precio);
+        lista.innerHTML += `<tr>
+          <td>${item.nombre}</td>
+          <td>$${parseFloat(item.precio).toFixed(2)}</td>
+          <td><button onclick="eliminarItem(${i})" style="color:red; border:none; background:none; cursor:pointer;">×</button></td>
+        </tr>`;
+      });
+      document.getElementById('total-val').innerText = `$${total.toFixed(2)}`;
+    }
 
-      const element = document.createElement('div');
-      element.innerHTML = `
-        <div style="padding: 50px; border: 10px solid #f8fafc; font-family: sans-serif;">
-          <h1 style="color: #026aa7; text-align:center;">PROMODENT</h1>
-          <p style="text-align:center; font-size: 12px;">Riobamba, Ecuador | Tel: +593 3 299 9999</p>
-          <hr style="margin: 20px 0;">
-          <p><strong>PACIENTE:</strong> ${paciente.nombre}</p>
-          <p><strong>FECHA:</strong> ${new Date().toLocaleDateString()}</p>
-          <div style="margin-top: 40px; min-height: 400px;">
-            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Prescripción Médica:</h3>
-            <p style="white-space: pre-wrap; line-height: 1.8;">${recetaTexto}</p>
-          </div>
-          <div style="text-align: center; margin-top: 50px;">
-            <p>__________________________</p>
-            <p>Firma y Sello del Odontólogo</p>
-          </div>
-        </div>
-      `;
-      html2pdf().from(element).save(`Receta_${paciente.nombre}.pdf`);
+    function autoSave() {
+      p.receta_temp = document.getElementById('rece').value;
+      p.notas = document.getElementById('notas').value;
+      localStorage.setItem("promodent_pacientes", JSON.stringify(db));
+    }
+
+    function imprimir(tipo) {
+      const printDiv = document.createElement('div');
+      printDiv.style.padding = "40px";
+      printDiv.style.fontFamily = "Arial";
+      
+      let contenido = `<div style="text-align:center"><h2 style="color:#026aa7">PROMODENT</h2><p>Riobamba, Ecuador</p></div><hr>
+                       <p><strong>Paciente:</strong> ${p.nombre}</p><p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p><br>`;
+
+      if(tipo === 'presupuesto') {
+        contenido += `<h3>PRESUPUESTO DE TRATAMIENTO</h3><table><tr><th>Descripción</th><th>Costo</th></tr>`;
+        let total = 0;
+        p.presupuesto.forEach(item => {
+          total += item.precio;
+          contenido += `<tr><td>${item.nombre}</td><td>$${item.precio.toFixed(2)}</td></tr>`;
+        });
+        contenido += `<tr style="font-weight:bold; background:#eee"><td>TOTAL</td><td>$${total.toFixed(2)}</td></tr></table>
+                      <p style="font-size:0.8em; margin-top:20px">* Este presupuesto tiene una validez de 15 días.</p>`;
+      } else if(tipo === 'receta') {
+        contenido += `<h3>RECETA MÉDICA</h3><p style="white-space:pre-wrap">${p.receta_temp}</p>`;
+      } else {
+        contenido += `<h2 style="text-align:center">CERTIFICADO MÉDICO</h2><p>Se certifica que el paciente presenta ${document.getElementById('cert-diag').value} y requiere ${document.getElementById('cert-dias').value} día(s) de reposo.</p>`;
+      }
+
+      contenido += `<br><br><div style="text-align:center"><p>_______________________</p><p>Firma Autorizada</p></div>`;
+      printDiv.innerHTML = contenido;
+      html2pdf().from(printDiv).save(`${tipo}_${p.nombre}.pdf`);
     }
 
     window.onload = init;
