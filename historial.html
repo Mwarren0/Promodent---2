@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    :root { --primary: #026aa7; --accent: #f59e0b; --success: #10b981; }
+    :root { --primary: #026aa7; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; }
     .folder-grid { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 20px; max-width: 1300px; margin: 20px auto; padding: 0 15px; }
     .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #d1d9e6; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
     
@@ -23,18 +23,19 @@
     .tratado { background: #e0f2fe; border-color: #3b82f6; color: #1d4ed8; }
     .ausente { background: #f1f5f9; border-color: #94a3b8; color: #94a3b8; border-style: dashed; }
 
-    /* Tablas de Presupuesto */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
-    th { background: #f8fafc; text-align: left; padding: 8px; border-bottom: 2px solid #edf2f7; }
+    /* Tablas y Forms */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background: #f8fafc; text-align: left; padding: 10px; border-bottom: 2px solid #edf2f7; font-size: 0.85em; }
     td { padding: 8px; border-bottom: 1px solid #edf2f7; }
-    .input-table { border: none; padding: 5px; width: 100%; background: transparent; }
-    .total-row { font-weight: bold; font-size: 1.1em; color: var(--primary); background: #f0f7ff; }
-
+    
+    input, textarea { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: inherit; width: 100%; box-sizing: border-box; }
+    .input-inline { border: 1px solid #eee; padding: 5px; width: 100%; }
+    
     .tag { padding: 4px 10px; background: #edf2f7; border-radius: 15px; font-size: 0.8em; cursor: pointer; border: 1px solid #cbd5e1; display: inline-block; margin: 2px; }
     .tag:hover { background: var(--primary); color: white; }
     
-    textarea, input { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: inherit; }
-    .btn-action { color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+    .btn-action { color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+    .btn-add { background: var(--primary); padding: 8px; margin-top: 5px; font-size: 0.8em; }
   </style>
 </head>
 <body>
@@ -49,13 +50,12 @@
   <main class="folder-grid">
     <section>
       <div class="card">
-        <h1 id="p-nombre" style="color: var(--primary); margin:0;">Paciente</h1>
+        <h1 id="p-nombre" style="color: var(--primary); margin:0;">Cargando...</h1>
         <p id="p-meta" style="color: #718096;"></p>
       </div>
 
       <div class="card">
         <h3>🦷 Odontograma</h3>
-        
         <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
             <div class="arcada" id="sup"></div>
             <div class="arcada" id="inf"></div>
@@ -63,52 +63,56 @@
       </div>
 
       <div class="card">
-        <h3>💰 Presupuesto de Tratamiento</h3>
-        <table id="tabla-presupuesto">
+        <h3>💰 Presupuesto Manual</h3>
+        <table>
           <thead>
             <tr>
-              <th>Tratamiento</th>
-              <th width="80">Costo</th>
+              <th>Procedimiento / Tratamiento</th>
+              <th width="100">Costo ($)</th>
               <th width="40"></th>
             </tr>
           </thead>
           <tbody id="items-presupuesto">
             </tbody>
-          <tfoot>
-            <tr class="total-row">
-              <td>TOTAL ESTIMADO</td>
-              <td id="total-val">$0.00</td>
-              <td></td>
-            </tr>
-          </tfoot>
         </table>
-        <div class="quick-list" style="margin-top:10px;">
-          <span class="tag" onclick="agregarItem('Limpieza Profunda', 35)">+ Limpieza ($35)</span>
-          <span class="tag" onclick="agregarItem('Resina Simple', 40)">+ Resina ($40)</span>
-          <span class="tag" onclick="agregarItem('Extracción', 45)">+ Extracción ($45)</span>
-          <span class="tag" onclick="agregarItem('Blanqueamiento', 120)">+ Blanqueamiento ($120)</span>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px; background: #fdfdfd; padding: 10px; border: 1px dashed #ccc;">
+          <input type="text" id="new-prod" placeholder="Nombre del tratamiento">
+          <input type="number" id="new-price" placeholder="Precio" style="width: 120px;">
+          <button class="btn-action btn-add" onclick="agregarItemManual()" style="width: 150px; margin:0;">+ Agregar</button>
         </div>
-        <button class="btn-action" style="background:#6366f1;" onclick="imprimir('presupuesto')">Generar Proforma PDF</button>
+
+        <div class="quick-list" style="margin-top:10px;">
+          <p style="font-size: 0.75em; color: #999;">Sugerencias rápidas:</p>
+          <span class="tag" onclick="agregarItemManual('Limpieza Profunda', 35)">Limpieza ($35)</span>
+          <span class="tag" onclick="agregarItemManual('Resina Simple', 40)">Resina ($40)</span>
+          <span class="tag" onclick="agregarItemManual('Extracción', 45)">Extracción ($45)</span>
+        </div>
+
+        <div style="text-align: right; margin-top: 20px; border-top: 2px solid #eee; padding-top: 10px;">
+          <h2 id="total-val" style="color: var(--primary);">Total: $0.00</h2>
+          <button class="btn-action" style="background:#6366f1; width: auto; padding: 10px 30px;" onclick="imprimir('presupuesto')">Descargar Proforma PDF</button>
+        </div>
       </div>
     </section>
 
     <aside>
       <div class="card" style="border-left: 5px solid var(--success);">
         <h3>💊 Recetario</h3>
-        <textarea id="rece" rows="5" oninput="autoSave()" placeholder="Escribe la receta..."></textarea>
+        <textarea id="rece" rows="6" oninput="autoSave()" placeholder="Escribe la prescripción..."></textarea>
         <button class="btn-action" style="background:var(--success);" onclick="imprimir('receta')">Descargar Receta</button>
       </div>
 
       <div class="card" style="border-left: 5px solid var(--accent);">
         <h3>📜 Certificado Médico</h3>
-        <input type="text" id="cert-diag" placeholder="Diagnóstico">
-        <input type="number" id="cert-dias" value="1" style="margin-top:5px;">
+        <p style="font-size: 0.8em; color: #666; margin-bottom: 5px;">Redacción libre del certificado:</p>
+        <textarea id="cert-cuerpo" rows="8" placeholder="Ej: presenta un cuadro de pulpitis, requiere 3 días de reposo..."></textarea>
         <button class="btn-action" style="background:var(--accent);" onclick="imprimir('cert')">Descargar Certificado</button>
       </div>
-      
+
       <div class="card">
-        <h3>📝 Notas Adicionales</h3>
-        <textarea id="notas" rows="4" oninput="autoSave()" placeholder="Observaciones generales..."></textarea>
+        <h3>📝 Notas del Caso</h3>
+        <textarea id="notas" rows="4" oninput="autoSave()" placeholder="Evolución, alergias o notas internas..."></textarea>
       </div>
     </aside>
   </main>
@@ -125,6 +129,7 @@
       document.getElementById('p-meta').innerText = `ID: ${p.id} | Tel: ${p.telefono}`;
       document.getElementById('rece').value = p.receta_temp || "";
       document.getElementById('notas').value = p.notas || "";
+      document.getElementById('cert-cuerpo').value = p.cert_temp || "";
       
       if(!p.presupuesto) p.presupuesto = [];
       renderOdontograma();
@@ -151,8 +156,17 @@
       draw([48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38], 'inf');
     }
 
-    function agregarItem(nombre, precio) {
-      p.presupuesto.push({ nombre, precio });
+    // LÓGICA DE PRESUPUESTO MANUAL
+    function agregarItemManual(nombreManual = '', precioManual = '') {
+      const n = nombreManual || document.getElementById('new-prod').value;
+      const pr = precioManual || document.getElementById('new-price').value;
+
+      if(!n || !pr) return alert("Ingresa nombre y precio");
+
+      p.presupuesto.push({ nombre: n, precio: parseFloat(pr) });
+      document.getElementById('new-prod').value = "";
+      document.getElementById('new-price').value = "";
+      
       renderPresupuesto();
       autoSave();
     }
@@ -168,47 +182,76 @@
       lista.innerHTML = "";
       let total = 0;
       p.presupuesto.forEach((item, i) => {
-        total += parseFloat(item.precio);
+        total += item.precio;
         lista.innerHTML += `<tr>
           <td>${item.nombre}</td>
-          <td>$${parseFloat(item.precio).toFixed(2)}</td>
-          <td><button onclick="eliminarItem(${i})" style="color:red; border:none; background:none; cursor:pointer;">×</button></td>
+          <td>$${item.precio.toFixed(2)}</td>
+          <td style="text-align:center;"><button onclick="eliminarItem(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer; font-weight:bold;">×</button></td>
         </tr>`;
       });
-      document.getElementById('total-val').innerText = `$${total.toFixed(2)}`;
+      document.getElementById('total-val').innerText = `Total: $${total.toFixed(2)}`;
     }
 
     function autoSave() {
       p.receta_temp = document.getElementById('rece').value;
       p.notas = document.getElementById('notas').value;
+      p.cert_temp = document.getElementById('cert-cuerpo').value;
       localStorage.setItem("promodent_pacientes", JSON.stringify(db));
     }
 
     function imprimir(tipo) {
       const printDiv = document.createElement('div');
-      printDiv.style.padding = "40px";
-      printDiv.style.fontFamily = "Arial";
+      printDiv.style.padding = "50px";
+      printDiv.style.fontFamily = "Arial, sans-serif";
       
-      let contenido = `<div style="text-align:center"><h2 style="color:#026aa7">PROMODENT</h2><p>Riobamba, Ecuador</p></div><hr>
-                       <p><strong>Paciente:</strong> ${p.nombre}</p><p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p><br>`;
+      let html = `
+        <div style="text-align:center; border-bottom: 2px solid #026aa7; padding-bottom:10px;">
+          <h1 style="color:#026aa7; margin:0;">PROMODENT</h1>
+          <p style="margin:5px 0;">Clínica Dental Especializada</p>
+          <p style="font-size:12px; color:#666;">Riobamba, Ecuador | Tel: +593 3 299 9999</p>
+        </div>
+        <br>
+        <p><strong>Paciente:</strong> ${p.nombre}</p>
+        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+        <br>
+      `;
 
       if(tipo === 'presupuesto') {
-        contenido += `<h3>PRESUPUESTO DE TRATAMIENTO</h3><table><tr><th>Descripción</th><th>Costo</th></tr>`;
+        html += `<h3 style="text-align:center; background:#f0f4fa; padding:10px;">PRESUPUESTO DE TRATAMIENTO</h3>
+                 <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                 <tr style="background:#eee;">
+                    <th style="padding:10px; border:1px solid #ccc;">Descripción</th>
+                    <th style="padding:10px; border:1px solid #ccc; width:100px;">Costo</th>
+                 </tr>`;
         let total = 0;
         p.presupuesto.forEach(item => {
           total += item.precio;
-          contenido += `<tr><td>${item.nombre}</td><td>$${item.precio.toFixed(2)}</td></tr>`;
+          html += `<tr>
+                    <td style="padding:10px; border:1px solid #ccc;">${item.nombre}</td>
+                    <td style="padding:10px; border:1px solid #ccc;">$${item.precio.toFixed(2)}</td>
+                   </tr>`;
         });
-        contenido += `<tr style="font-weight:bold; background:#eee"><td>TOTAL</td><td>$${total.toFixed(2)}</td></tr></table>
-                      <p style="font-size:0.8em; margin-top:20px">* Este presupuesto tiene una validez de 15 días.</p>`;
-      } else if(tipo === 'receta') {
-        contenido += `<h3>RECETA MÉDICA</h3><p style="white-space:pre-wrap">${p.receta_temp}</p>`;
-      } else {
-        contenido += `<h2 style="text-align:center">CERTIFICADO MÉDICO</h2><p>Se certifica que el paciente presenta ${document.getElementById('cert-diag').value} y requiere ${document.getElementById('cert-dias').value} día(s) de reposo.</p>`;
+        html += `<tr style="font-weight:bold; background:#f0f4fa;">
+                  <td style="padding:10px; border:1px solid #ccc; text-align:right;">TOTAL:</td>
+                  <td style="padding:10px; border:1px solid #ccc;">$${total.toFixed(2)}</td>
+                 </tr></table>
+                 <p style="font-size:11px; margin-top:20px;">* Validez del presupuesto: 15 días.</p>`;
+      } 
+      else if(tipo === 'cert') {
+        const cuerpo = document.getElementById('cert-cuerpo').value;
+        html += `<h2 style="text-align:center;">CERTIFICADO MÉDICO</h2><br>
+                 <p style="line-height:1.8; text-align:justify;">
+                    Por medio de la presente, se certifica que el paciente <strong>${p.nombre}</strong> con identificación <strong>${p.id}</strong>, 
+                    ${cuerpo}
+                 </p>`;
+      }
+      else {
+        html += `<h3>RP / PRESCRIPCIÓN MÉDICA</h3><p style="white-space:pre-wrap; line-height:1.6;">${p.receta_temp}</p>`;
       }
 
-      contenido += `<br><br><div style="text-align:center"><p>_______________________</p><p>Firma Autorizada</p></div>`;
-      printDiv.innerHTML = contenido;
+      html += `<br><br><br><div style="text-align:center;"><p>_______________________</p><p>Firma y Sello</p></div>`;
+      
+      printDiv.innerHTML = html;
       html2pdf().from(printDiv).save(`${tipo}_${p.nombre}.pdf`);
     }
 
