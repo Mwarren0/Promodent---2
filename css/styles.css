@@ -536,3 +536,49 @@ footer {
 @media (max-width: 768px) {
     .folder-container { grid-template-columns: 1fr; }
 }
+
+/* Contenedor del Odontograma Pro */
+.odontograma-pro {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 10px;
+    padding: 20px;
+    background: #fff;
+    overflow-x: auto;
+}
+
+.diente-pro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 45px;
+}
+
+.diente-num {
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary);
+}
+
+/* El Diamante/Diente con sus 5 caras */
+.diente-svg {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.cara {
+    fill: #fff;
+    stroke: #333;
+    stroke-width: 1;
+    transition: all 0.2s;
+}
+
+/* Estados de las caras */
+.cara.sana { fill: #ffffff; }
+.cara.caries { fill: #ef4444; } /* Rojo */
+.cara.tratado { fill: #3b82f6; } /* Azul */
+.cara.sellado { fill: #10b981; } /* Verde */
+
+.diente-ausente { opacity: 0.2; filter: grayscale(1); }
