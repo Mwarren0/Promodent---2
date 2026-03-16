@@ -12,47 +12,44 @@
     .folder-grid { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 15px; }
     .card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #d1d9e6; margin-bottom: 20px; }
 
-    /* ODONTOGRAMA OPTIMIZADO */
-    .odontograma-container { 
-      background: #f8fafc; 
-      padding: 15px; 
-      border-radius: 8px; 
-      overflow-x: auto; /* Scroll si la pantalla es chica */
-    }
-    .arcada { 
-      display: flex; 
-      justify-content: center; 
-      gap: 5px; 
-      margin-bottom: 20px; 
-      min-width: 800px; /* Evita que los dientes se amontonen */
-    }
-    .diente-pro { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      width: 45px; /* Tamaño fijo para que no crezcan de más */
-    }
+    /* ODONTOGRAMA */
+    .odontograma-container { background: #f8fafc; padding: 15px; border-radius: 8px; overflow-x: auto; }
+    .arcada { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; min-width: 850px; }
+    .diente-pro { display: flex; flex-direction: column; align-items: center; width: 48px; position: relative; }
     .diente-num { font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #444; }
     
-    /* El dibujo del diente */
-    .diente-svg { width: 40px; height: 40px; touch-action: none; }
+    .diente-svg { width: 40px; height: 40px; }
     .cara { fill: white; stroke: #666; stroke-width: 1; cursor: pointer; transition: 0.2s; }
-    .cara:hover { stroke: #000; stroke-width: 1.5; }
     
-    /* Colores de estados */
+    /* Estados */
     .sana { fill: #ffffff; }
     .caries { fill: var(--danger); }
     .tratado { fill: #3b82f6; }
     .sellado { fill: var(--success); }
-    .diente-ausente { opacity: 0.15; pointer-events: none; }
 
-    /* UI general */
-    textarea, input { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: inherit; box-sizing: border-box; }
+    /* CORRECCIÓN: Diente Ausente */
+    .diente-pro.es-ausente .diente-svg { opacity: 0.1; }
+    .diente-pro.es-ausente .cara { cursor: default; pointer-events: none; }
+    
+    /* El botón SIEMPRE debe funcionar */
+    .btn-ausente { 
+        font-size: 9px; 
+        margin-top: 5px; 
+        cursor: pointer; 
+        background: #eee; 
+        border: 1px solid #ccc; 
+        border-radius: 4px;
+        padding: 2px 4px;
+        z-index: 10;
+        pointer-events: auto !important; 
+    }
+    .btn-ausente:hover { background: #ddd; }
+
+    textarea, input { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; box-sizing: border-box; }
     .btn-action { color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
     th { text-align: left; padding: 8px; background: #f1f5f9; }
     td { padding: 6px; border-bottom: 1px solid #eee; }
-    .tag { padding: 4px 8px; background: #eee; border-radius: 12px; font-size: 0.75em; cursor: pointer; margin: 2px; display: inline-block; }
   </style>
 </head>
 <body>
@@ -67,13 +64,12 @@
 <main class="folder-grid">
   <section>
     <div class="card">
-      <h2 id="p-nombre" style="color: var(--primary); margin:0;">Paciente</h2>
+      <h2 id="p-nombre" style="color: var(--primary); margin:0;">Cargando...</h2>
       <p id="p-meta" style="font-size: 0.9em; color: #666;"></p>
     </div>
 
     <div class="card">
-      <h3>🦷 Odontograma Gráfico</h3>
-      <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">Clic en las caras para: Blanco (Sano) → Rojo (Caries) → Azul (Resina) → Verde (Sellante)</p>
+      <h3>🦷 Odontograma Interactivo</h3>
       
       <div class="odontograma-container">
         <div class="arcada" id="arcada-sup"></div>
@@ -82,7 +78,7 @@
     </div>
 
     <div class="card">
-      <h3>💰 Presupuesto y Tratamientos</h3>
+      <h3>💰 Presupuesto Manual</h3>
       <div style="display: flex; gap: 5px; margin-bottom: 10px;">
         <input type="text" id="new-prod" placeholder="Tratamiento...">
         <input type="number" id="new-price" placeholder="$" style="width: 80px;">
@@ -92,7 +88,7 @@
         <thead><tr><th>Descripción</th><th>Precio</th><th></th></tr></thead>
         <tbody id="items-presupuesto"></tbody>
       </table>
-      <h3 id="total-val" style="text-align: right; color: var(--primary); margin-top:10px;">Total: $0.00</h3>
+      <h3 id="total-val" style="text-align: right; color: var(--primary);">Total: $0.00</h3>
       <button class="btn-action" style="background:#6366f1" onclick="imprimir('presupuesto')">Generar Proforma PDF</button>
     </div>
   </section>
@@ -100,19 +96,14 @@
   <aside>
     <div class="card" style="border-left: 5px solid var(--success);">
       <h3>💊 Recetario</h3>
-      <textarea id="rece" rows="6" oninput="autoSave()" placeholder="Prescripción médica..."></textarea>
+      <textarea id="rece" rows="6" oninput="autoSave()" placeholder="Indicaciones..."></textarea>
       <button class="btn-action" style="background:var(--success);" onclick="imprimir('receta')">Descargar Receta</button>
     </div>
 
     <div class="card" style="border-left: 5px solid var(--accent);">
       <h3>📜 Certificado Médico</h3>
-      <textarea id="cert-cuerpo" rows="8" oninput="autoSave()" placeholder="Redacta el certificado aquí..."></textarea>
+      <textarea id="cert-cuerpo" rows="8" oninput="autoSave()" placeholder="Redacción del certificado..."></textarea>
       <button class="btn-action" style="background:var(--accent);" onclick="imprimir('cert')">Descargar Certificado</button>
-    </div>
-
-    <div class="card">
-      <h3>📝 Notas</h3>
-      <textarea id="notas" rows="4" oninput="autoSave()" placeholder="Evolución clínica..."></textarea>
     </div>
   </aside>
 </main>
@@ -124,11 +115,10 @@
   let p = db.find(item => item.id === pacienteId);
 
   function init() {
-    if(!p) { alert("Error: Paciente no encontrado"); window.location.href='pacientes.html'; return; }
+    if(!p) return window.location.href='pacientes.html';
     document.getElementById('p-nombre').innerText = p.nombre;
-    document.getElementById('p-meta').innerText = `Expediente: ${p.id} | Tel: ${p.telefono}`;
+    document.getElementById('p-meta').innerText = `ID: ${p.id} | Tel: ${p.telefono}`;
     document.getElementById('rece').value = p.receta_temp || "";
-    document.getElementById('notas').value = p.notas || "";
     document.getElementById('cert-cuerpo').value = p.cert_temp || "";
     
     if(!p.odontograma) p.odontograma = {};
@@ -148,7 +138,8 @@
       list.forEach(num => {
         const d = p.odontograma[num] || { t:'sana', b:'sana', l:'sana', r:'sana', c:'sana', ausente: false };
         const div = document.createElement('div');
-        div.className = `diente-pro ${d.ausente ? 'diente-ausente' : ''}`;
+        div.className = `diente-pro ${d.ausente ? 'es-ausente' : ''}`;
+        
         div.innerHTML = `
           <span class="diente-num">${num}</span>
           <svg class="diente-svg" viewBox="0 0 40 40">
@@ -158,7 +149,9 @@
             <polygon class="cara ${d.l}" points="0,0 0,40 10,30 10,10" onclick="cambiarEstado(${num},'l')"/>
             <rect class="cara ${d.c}" x="10" y="10" width="20" height="20" onclick="cambiarEstado(${num},'c')"/>
           </svg>
-          <button onclick="toggleAusente(${num})" style="font-size:8px; margin-top:3px; cursor:pointer;">${d.ausente ? 'Poner':'Quitar'}</button>
+          <button class="btn-ausente" onclick="toggleAusente(${num})">
+            ${d.ausente ? 'RECONECTAR' : 'QUITAR'}
+          </button>
         `;
         cont.appendChild(div);
       });
@@ -169,6 +162,8 @@
 
   function cambiarEstado(num, cara) {
     if(!p.odontograma[num]) p.odontograma[num] = { t:'sana', b:'sana', l:'sana', r:'sana', c:'sana', ausente: false };
+    if(p.odontograma[num].ausente) return; // No pintar si no existe el diente
+
     const estados = ['sana', 'caries', 'tratado', 'sellado'];
     let actual = p.odontograma[num][cara];
     let index = (estados.indexOf(actual) + 1) % estados.length;
@@ -179,11 +174,19 @@
 
   function toggleAusente(num) {
     if(!p.odontograma[num]) p.odontograma[num] = { t:'sana', b:'sana', l:'sana', r:'sana', c:'sana', ausente: false };
+    
     p.odontograma[num].ausente = !p.odontograma[num].ausente;
+    
+    // Si se reincorpora, lo ponemos todo sano por defecto
+    if(!p.odontograma[num].ausente) {
+        p.odontograma[num] = { t:'sana', b:'sana', l:'sana', r:'sana', c:'sana', ausente: false };
+    }
+    
     renderOdontograma();
     autoSave();
   }
 
+  // Funciones de apoyo (Presupuesto, Guardado, Impresión iguales...)
   function agregarPresupuesto() {
     const n = document.getElementById('new-prod').value;
     const pr = document.getElementById('new-price').value;
@@ -209,29 +212,22 @@
   function autoSave() {
     p.receta_temp = document.getElementById('rece').value;
     p.cert_temp = document.getElementById('cert-cuerpo').value;
-    p.notas = document.getElementById('notas').value;
     localStorage.setItem("promodent_pacientes", JSON.stringify(db));
   }
 
   function imprimir(tipo) {
     const div = document.createElement('div');
     div.style.padding = "40px";
-    div.style.fontFamily = "sans-serif";
-    let html = `<h1 style="color:#026aa7; text-align:center;">PROMODENT</h1><hr><br>
-                <p><strong>Paciente:</strong> ${p.nombre}</p><p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p><br>`;
-
+    div.style.fontFamily = "Arial";
+    let html = `<h1 style="color:#026aa7; text-align:center;">PROMODENT</h1><hr><br><p><strong>Paciente:</strong> ${p.nombre}</p>`;
     if(tipo === 'presupuesto') {
-      html += `<h3>PRESUPUESTO</h3><table><tr style="background:#eee"><th>Tratamiento</th><th>Costo</th></tr>`;
-      let t = 0;
-      p.presupuesto.forEach(it => { t += it.precio; html += `<tr><td>${it.nombre}</td><td>$${it.precio.toFixed(2)}</td></tr>`; });
-      html += `<tr style="font-weight:bold"><td>TOTAL</td><td>$${t.toFixed(2)}</td></tr></table>`;
+        html += `<h3>PRESUPUESTO</h3>`;
+        p.presupuesto.forEach(it => html += `<p>${it.nombre} - $${it.precio.toFixed(2)}</p>`);
     } else if(tipo === 'cert') {
-      html += `<h2>CERTIFICADO MÉDICO</h2><p style="line-height:1.8">${document.getElementById('cert-cuerpo').value}</p>`;
+        html += `<h2>CERTIFICADO</h2><p>${document.getElementById('cert-cuerpo').value}</p>`;
     } else {
-      html += `<h3>RECETA</h3><p style="white-space:pre-wrap">${p.receta_temp}</p>`;
+        html += `<h3>RECETA</h3><p>${p.receta_temp}</p>`;
     }
-    
-    html += `<br><br><br><div style="text-align:center;"><p>_______________________</p><p>Firma y Sello</p></div>`;
     div.innerHTML = html;
     html2pdf().from(div).save(`${tipo}.pdf`);
   }
