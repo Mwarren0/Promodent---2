@@ -136,25 +136,66 @@
       renderPresupuesto();
     }
 
-    function renderOdontograma() {
-      const draw = (list, id) => {
-        const el = document.getElementById(id); el.innerHTML = "";
-        list.forEach(num => {
-          const estado = (p.odontograma && p.odontograma[num]) || 'sano';
-          const d = document.createElement('div');
-          d.className = `diente ${estado}`; d.innerText = num;
-          d.onclick = () => {
-            const cycle = { sano:'caries', caries:'tratado', tratado:'ausente', ausente:'sano' };
-            if(!p.odontograma) p.odontograma = {};
-            p.odontograma[num] = cycle[estado];
-            renderOdontograma(); autoSave();
-          };
-          el.appendChild(d);
+   function renderOdontograma() {
+    const arcadas = {
+        'sup': [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],
+        'inf': [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]
+    };
+
+    if (!p.odontograma) p.odontograma = {};
+
+    Object.keys(arcadas).forEach(key => {
+        const contenedor = document.getElementById(key);
+        contenedor.innerHTML = "";
+        contenedor.className = "odontograma-pro";
+
+        arcadas[key].forEach(num => {
+            const datosDiente = p.odontograma[num] || { 
+                c: 'sana', t: 'sana', b: 'sana', l: 'sana', r: 'sana', ausente: false 
+            };
+
+            const dienteDiv = document.createElement('div');
+            dienteDiv.className = `diente-pro ${datosDiente.ausente ? 'diente-ausente' : ''}`;
+            
+            // Creamos el SVG del diente con sus 5 caras (Top, Bottom, Left, Right, Center)
+            dienteDiv.innerHTML = `
+                <span class="diente-num">${num}</span>
+                <svg class="diente-svg" viewBox="0 0 40 40">
+                    <polygon class="cara ${datosDiente.t}" points="0,0 40,0 30,10 10,10" onclick="updateCara(${num}, 't')"/>
+                    <polygon class="cara ${datosDiente.r}" points="40,0 40,40 30,30 30,10" onclick="updateCara(${num}, 'r')"/>
+                    <polygon class="cara ${datosDiente.b}" points="0,40 40,40 30,30 10,30" onclick="updateCara(${num}, 'b')"/>
+                    <polygon class="cara ${datosDiente.l}" points="0,0 0,40 10,30 10,10" onclick="updateCara(${num}, 'l')"/>
+                    <rect class="cara ${datosDiente.c}" x="10" y="10" width="20" height="20" onclick="updateCara(${num}, 'c')"/>
+                </svg>
+                <button onclick="toggleAusente(${num})" style="font-size:9px; margin-top:5px; cursor:pointer;">${datosDiente.ausente ? 'Reponer' : 'Ausente'}</button>
+            `;
+            contenedor.appendChild(dienteDiv);
         });
-      };
-      draw([18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28], 'sup');
-      draw([48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38], 'inf');
+    });
+}
+
+function updateCara(dienteNum, caraKey) {
+    if (!p.odontograma[dienteNum]) {
+        p.odontograma[dienteNum] = { c: 'sana', t: 'sana', b: 'sana', l: 'sana', r: 'sana', ausente: false };
     }
+    
+    const estados = ['sana', 'caries', 'tratado', 'sellado'];
+    let actual = p.odontograma[dienteNum][caraKey];
+    let nextIndex = (estados.indexOf(actual) + 1) % estados.length;
+    
+    p.odontograma[dienteNum][caraKey] = estados[nextIndex];
+    renderOdontograma();
+    autoSave();
+}
+
+function toggleAusente(num) {
+    if (!p.odontograma[num]) {
+        p.odontograma[num] = { c: 'sana', t: 'sana', b: 'sana', l: 'sana', r: 'sana', ausente: false };
+    }
+    p.odontograma[num].ausente = !p.odontograma[num].ausente;
+    renderOdontograma();
+    autoSave();
+}
 
     // LÓGICA DE PRESUPUESTO MANUAL
     function agregarItemManual(nombreManual = '', precioManual = '') {
